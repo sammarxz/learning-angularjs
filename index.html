@@ -1,18 +1,63 @@
 <!DOCTYPE html>
-<html lang="pt-br" ng-app="helloWorld">
+<html lang="pt-br" ng-app="listaTelefonica">
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>AngularJS via Rodrigo Branas</title>
-  <script src="https://ajax.googleapis.com/ajax/libs/angularjs/1.8.0/angular.min.js"></script>
+  <link rel="stylesheet" href="./lib/bootstrap/css/bootstrap.min.css">
+  <style>
+    .jumbotron {
+      max-width: 400px;
+      margin: 0 auto;
+      padding: 24px;
+    }
+
+    .jumbotron .title {
+      text-align: center;
+    }
+
+    .table {
+      margin-top: 20px;
+    }
+
+    .form-control {
+      margin: 8px 0;
+    }
+  </style>
+  <script src="./lib/angular/angular.min.js"></script>
   <script>
-    angular.module('helloWorld', []);
-    angular.module('helloWorld').controller('helloWorldCtrl', function ($scope) {
-      $scope.message = 'Hello World';
+    angular.module('listaTelefonica', []);
+    angular.module('listaTelefonica').controller('listaTelefonicaCtrl', function($scope) {
+      $scope.title = 'Lista Telefônica';
+
+      $scope.contacts = [
+        { name: 'Samuel', tel: '81994556776' },
+        { name: 'Bruna', tel: '819966778294' },
+        { name: 'Churros', tel: '8199233020' }
+      ];
+
+      $scope.addContact = function(contact) {
+        $scope.contacts.push(contact);
+      }
     })
   </script>
 </head>
-<body ng-controller="helloWorldCtrl">
-  <h1>{{ message }}</h1>
+<body ng-controller="listaTelefonicaCtrl">
+  <div class="jumbotron">
+    <h3 class="title">{{ title }}</h3>
+    <table class="table table-striped">
+      <tr>
+        <th>Nome</th>
+        <th>Telefone</th>
+      </tr>
+      <tr ng-repeat="contact in contacts"> 
+        <td ng-repeat="(key, value) in contact">{{ value }}</td>
+      </tr>
+    </table>
+    <hr/>
+    <input type="text" class="form-control" name="name" ng-model="name" placeholder="Nome do contato">
+    <input type="number" class="form-control" name="tel" ng-model="tel" placeholder="Telefone do contato">
+    <button class="btn btn-primary btn-block" ng-click="addContact({name, tel})">Adicionar Contato</button>
+  </div>
 </body>
 </html>
