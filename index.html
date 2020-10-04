@@ -37,7 +37,8 @@
       ];
 
       $scope.addContact = function(contact) {
-        $scope.contacts.push(contact);
+        $scope.contacts.push(angular.copy(contact));
+        delete $scope.contact;
       }
     })
   </script>
@@ -55,9 +56,9 @@
       </tr>
     </table>
     <hr/>
-    <input type="text" class="form-control" name="name" ng-model="name" placeholder="Nome do contato">
-    <input type="number" class="form-control" name="tel" ng-model="tel" placeholder="Telefone do contato">
-    <button class="btn btn-primary btn-block" ng-click="addContact({name, tel})">Adicionar Contato</button>
+    <input type="text" class="form-control" name="name" ng-model="contact.name" placeholder="Nome do contato">
+    <input type="number" class="form-control" name="tel" ng-model="contact.tel" placeholder="Telefone do contato">
+    <button class="btn btn-primary btn-block" ng-click="addContact(contact)">Adicionar Contato</button>
   </div>
 </body>
 </html>
