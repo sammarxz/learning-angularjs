@@ -1,14 +1,11 @@
-angular.module('listaTelefonica').controller('listaTelefonicaCtrl', function ($scope, $http) {
+angular.module('listaTelefonica').controller('listaTelefonicaCtrl', function ($scope, $http, contactsAPI) {
   const API_URL = 'https://jsonplaceholder.typicode.com/users';
 
   $scope.title = 'Lista Telefônica';
   $scope.showForm = false;
 
   const loadContacts = function () {
-    $http({
-      method: 'GET',
-      url: API_URL
-    }).then(function (response){
+    contactsAPI.getContacts().then(function (response){
       if (response.status === 200) {
         $scope.contacts = response.data
       }
@@ -23,7 +20,7 @@ angular.module('listaTelefonica').controller('listaTelefonicaCtrl', function ($s
 
   $scope.addContact = function (keyEvent, contact) {
     if (keyEvent.which === 13) {
-      $http.post(API_URL, contact)
+      contactsAPI.addContact(contact)
       .then(function(response) {
         delete $scope.contact;
         $scope.showForm = false;
@@ -40,7 +37,7 @@ angular.module('listaTelefonica').controller('listaTelefonicaCtrl', function ($s
       if (contact.selected) return contact;
     });
     selectedContacts.map(function(contact) {
-      $http.delete(`${API_URL}/${contact.id}`).then(function (response) {
+      contactsAPI.deleteContact(contact.id).then(function (response) {
         if (response.status === 200) {
           $scope.contacts = contacts.filter(function (contact) {
             if (!contact.selected) return contact;
