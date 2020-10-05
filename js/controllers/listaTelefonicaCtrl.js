@@ -1,6 +1,4 @@
-angular.module('listaTelefonica').controller('listaTelefonicaCtrl', function ($scope, $http, contactsAPI) {
-  const API_URL = 'https://jsonplaceholder.typicode.com/users';
-
+angular.module('listaTelefonica').controller('listaTelefonicaCtrl', function ($scope, contactsAPI) {
   $scope.title = 'Lista Telefônica';
   $scope.showForm = false;
 
