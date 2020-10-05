@@ -1,16 +1,14 @@
-angular.module('listaTelefonica').factory("contactsAPI", function($http) {
-  const API_URL = 'https://jsonplaceholder.typicode.com/users';
-
+angular.module('listaTelefonica').factory("contactsAPI", function($http, config) {
   const _getContacts = function () {
-    return $http.get(API_URL)
+    return $http.get(config.baseUrl)
   }
 
   const _addContact = function (contact) {
-    return $http.post(API_URL, contact)
+    return $http.post(config.baseUrl, contact)
   }
 
   const _deleteContact = function (id) {
-    return $http.delete(`${API_URL}/${id}`)
+    return $http.delete(`${config.baseUrl}/${id}`)
   }
 
   return {
