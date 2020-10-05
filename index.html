@@ -5,25 +5,7 @@
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>AngularJS via Rodrigo Branas</title>
   <link rel="stylesheet" href="./lib/bootstrap/css/bootstrap.min.css">
-  <style>
-    .jumbotron {
-      max-width: 400px;
-      margin: 0 auto;
-      padding: 24px;
-    }
-
-    .jumbotron .title {
-      text-align: center;
-    }
-
-    .table {
-      margin-top: 20px;
-    }
-
-    .form-control {
-      margin: 8px 0;
-    }
-  </style>
+  <link rel="stylesheet" href="./assets/css/main.css">
   <script src="./lib/angular/angular.min.js"></script>
   <script>
     angular.module('listaTelefonica', []);
@@ -36,9 +18,28 @@
         { name: 'Churros', tel: '8199233020' }
       ];
 
+      $scope.operators = [
+        { name: 'Claro', code: 21 },
+        { name: 'Oi', code: 14 },
+        { name: 'Tim', code: 17 },
+        { name: 'Vivo', code: 13 }
+      ]
+
       $scope.addContact = function(contact) {
         $scope.contacts.push(angular.copy(contact));
         delete $scope.contact;
+      }
+
+      $scope.removeContact = function(contacts) {
+        $scope.contacts = contacts.filter(function(contact) {
+          if (!contact.selected) return contact;
+        });
+      }
+
+      $scope.isSelected = function(contacts) {
+        return contacts.some(function(contact) {
+          return contact.selected;
+        });
       }
     })
   </script>
@@ -48,17 +49,30 @@
     <h3 class="title">{{ title }}</h3>
     <table class="table table-striped">
       <tr>
+        <th></th>
         <th>Nome</th>
         <th>Telefone</th>
+        <th>Operadora</th>
       </tr>
-      <tr ng-repeat="contact in contacts"> 
-        <td ng-repeat="(key, value) in contact">{{ value }}</td>
+      <tr ng-repeat="contact in contacts" ng-class="{active: contact.selected}"> 
+        <!-- <td ng-repeat="(key, value) in contact">{{ value }}</td> -->
+        <td><input type="checkbox" ng-model="contact.selected" /></td>
+        <td>{{ contact.name }}</td>
+        <td>{{ contact.tel }}</td>
+        <td>{{ contact.operators.name }}</td>
       </tr>
     </table>
     <hr/>
-    <input type="text" class="form-control" name="name" ng-model="contact.name" placeholder="Nome do contato">
-    <input type="number" class="form-control" name="tel" ng-model="contact.tel" placeholder="Telefone do contato">
-    <button class="btn btn-primary btn-block" ng-click="addContact(contact)">Adicionar Contato</button>
+    <form>
+      <input type="text" class="form-control" name="name" ng-model="contact.name" placeholder="Nome do contato">
+      <input type="number" class="form-control" name="tel" ng-model="contact.tel" placeholder="Telefone do contato">
+      <select class="form-control" name="operators" ng-model="contact.operators" ng-options="operator.name for operator in operators">
+        <option value="">Selecione uma operadora</option>
+      </select>
+      <button class="btn btn-primary btn-block" ng-click="addContact(contact)" ng-disabled="!contact.name || !contact.tel">Adicionar Contato</button>
+      <button class="btn btn-danger btn-block" ng-show="isSelected(contacts)" ng-click="removeContact(contacts)">Apagar contatos</button>
+    </form>
   </div>
+  <div ng-include="'components/footer.html'"></div>
 </body>
 </html>
