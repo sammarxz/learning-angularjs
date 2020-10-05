@@ -1,85 +1,147 @@
 <!DOCTYPE html>
 <html lang="pt-br" ng-app="listaTelefonica">
+
 <head>
   <meta charset="UTF-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>AngularJS via Rodrigo Branas</title>
   <link rel="stylesheet" href="./lib/bootstrap/css/bootstrap.min.css">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <link rel="stylesheet" href="./assets/css/main.css">
   <script src="./lib/angular/angular.min.js"></script>
   <script>
     angular.module('listaTelefonica', []);
-    angular.module('listaTelefonica').controller('listaTelefonicaCtrl', function($scope) {
+    angular.module('listaTelefonica').controller('listaTelefonicaCtrl', function ($scope) {
       $scope.title = 'Lista Telefônica';
 
-      $scope.contacts = [
-        { name: 'Samuel', tel: '81994556776' },
-        { name: 'Bruna', tel: '819966778294' },
-        { name: 'Churros', tel: '8199233020' }
+      $scope.contacts = [{
+          name: 'Samuel',
+          tel: '81994556776',
+          operators: {
+            name: 'Claro',
+            code: '12'
+          },
+          date: new Date()
+        },
+        {
+          name: 'Bruna',
+          tel: '819966778294',
+          operators: {
+            name: 'Tim',
+            code: '14'
+          },
+          date: new Date()
+        },
+        {
+          name: 'Churros',
+          tel: '8199233020',
+          operators: {
+            name: 'Vivo',
+            code: '13'
+          },
+          date: new Date()
+        }
       ];
 
-      $scope.operators = [
-        { name: 'Claro', code: 21 },
-        { name: 'Oi', code: 14 },
-        { name: 'Tim', code: 17 },
-        { name: 'Vivo', code: 13 }
+      $scope.operators = [{
+          name: 'Claro',
+          code: 21
+        },
+        {
+          name: 'Oi',
+          code: 14
+        },
+        {
+          name: 'Tim',
+          code: 17
+        },
+        {
+          name: 'Vivo',
+          code: 13
+        }
       ]
 
-      $scope.addContact = function(contact) {
+      $scope.addContact = function (contact) {
+        contact.date = new Date();
         $scope.contacts.push(angular.copy(contact));
         delete $scope.contact;
+        $scope.contactForm.$setPrestine();
       }
 
-      $scope.removeContact = function(contacts) {
-        $scope.contacts = contacts.filter(function(contact) {
+      $scope.removeContact = function (contacts) {
+        $scope.contacts = contacts.filter(function (contact) {
           if (!contact.selected) return contact;
         });
       }
 
-      $scope.isSelected = function(contacts) {
-        return contacts.some(function(contact) {
+      $scope.isSelected = function (contacts) {
+        return contacts.some(function (contact) {
           return contact.selected;
         });
+      }
+
+      $scope.orderBy = function(type) {
+        $scope.direction = !$scope.direction
+        $scope.order = type
       }
     })
   </script>
 </head>
+
 <body ng-controller="listaTelefonicaCtrl">
-  <div class="jumbotron">
-    <h3 class="title">{{ title }}</h3>
-    <table class="table table-striped">
-      <tr>
-        <th></th>
-        <th>Nome</th>
-        <th>Telefone</th>
-        <th>Operadora</th>
-      </tr>
-      <tr ng-repeat="contact in contacts" ng-class="{active: contact.selected}"> 
-        <!-- <td ng-repeat="(key, value) in contact">{{ value }}</td> -->
-        <td><input type="checkbox" ng-model="contact.selected" /></td>
-        <td>{{ contact.name }}</td>
-        <td>{{ contact.tel }}</td>
-        <td>{{ contact.operators.name }}</td>
-      </tr>
-    </table>
-    <hr/>
-    <form name="contactForm">
-      <input type="text" class="form-control" name="name" ng-model="contact.name" ng-required="true" placeholder="Nome do contato">
-      <input type="number" class="form-control" name="tel" ng-model="contact.tel" ng-required="true" placeholder="Telefone do contato">
-      <select class="form-control" name="operators" ng-model="contact.operators" ng-options="operator.name for operator in operators">
-        <option value="">Selecione uma operadora</option>
-      </select>
-      <button type="submit" class="btn btn-primary btn-block" ng-click="addContact(contact)" ng-disabled="contactForm.$invalid">Adicionar Contato</button>
-      <button class="btn btn-danger btn-block" ng-show="isSelected(contacts)" ng-click="removeContact(contacts)">Apagar contatos</button>
-    </form>
-    <div ng-show="contactForm.$invalid" class="alert alert-danger alert-dismissible" role="alert">
-      <button type="button" class="close" data-dismiss="alert" aria-label="Close"><span aria-hidden="true">&times;</span></button>
-      Por favor, preencha o Nome e o Telefone do contato!
+  <div class="container">
+    <div class="jumbotron">
+      <div class="row">
+        <div class="col-xs-12 col-sm-6">
+          <h3 class="title">{{ title }}</h3>
+        </div>
+        <div class="col-xs-12 col-sm-6">
+          <input type="text" ng-model="search" class="form-control" placeholder="buscar">
+        </div>
+      </div>
+      <table class="table table-striped">
+        <tr>
+          <th></th>
+          <th><a ng-click="orderBy('name')">Nome</a></th>
+          <th>Telefone</th>
+          <th>Operadora</th>
+          <th><a ng-click="orderBy('date')">Data de adição</a></th>
+        </tr>
+        <tr ng-repeat="contact in contacts | filter: {name: search} | orderBy: order || 'name':direction" ng-class="{active: contact.selected}">
+          <!-- <td ng-repeat="(key, value) in contact">{{ value }}</td> -->
+          <td><input type="checkbox" ng-model="contact.selected" /></td>
+          <td>{{ contact.name }}</td>
+          <td>{{ contact.tel }}</td>
+          <td>{{ contact.operators.name }}</td>
+          <td>{{ contact.date | date:'dd/MM/yyyy' }}</td>
+        </tr>
+      </table>
+      <hr />
+      <form name="contactForm">
+        <input type="text" class="form-control" name="name" ng-model="contact.name" ng-required="true"
+          placeholder="Nome do contato">
+        <input type="number" class="form-control" name="tel" ng-model="contact.tel" ng-required="true"
+          placeholder="Telefone do contato">
+        <select class="form-control" name="operators" ng-model="contact.operators"
+          ng-options="operator.name for operator in operators">
+          <option value="">Selecione uma operadora</option>
+        </select>
+        <button type="submit" class="btn btn-primary btn-block" ng-click="addContact(contact)"
+          ng-disabled="contactForm.$invalid">Adicionar Contato</button>
+        <button class="btn btn-danger btn-block" ng-show="isSelected(contacts)"
+          ng-click="removeContact(contacts)">Apagar contatos</button>
+      </form>
+      <div ng-show="contactForm.$invalid && contactForm.$prestine" class="alert alert-danger alert-dismissible"
+        role="alert">
+        <button type="button" class="close" data-dismiss="alert" aria-label="Close"><span
+            aria-hidden="true">&times;</span></button>
+        Por favor, preencha o Nome e o Telefone do contato!
+      </div>
     </div>
+    <div ng-include="'components/footer.html'"></div>
   </div>
-  <div ng-include="'components/footer.html'"></div>
 
   <script src="./lib/jquery/jquery-3.5.1.min.js"></script>
   <script src="./lib/bootstrap/js/bootstrap.min.js"></script>
 </body>
+
 </html>
