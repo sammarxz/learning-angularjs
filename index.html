@@ -10,67 +10,59 @@
   <script src="./lib/angular/angular.min.js"></script>
   <script>
     angular.module('listaTelefonica', []);
-    angular.module('listaTelefonica').controller('listaTelefonicaCtrl', function ($scope) {
+    angular.module('listaTelefonica').controller('listaTelefonicaCtrl', function ($scope, $http) {
+
+      const API_URL = 'https://jsonplaceholder.typicode.com/users';
+
       $scope.title = 'Lista Telefônica';
+      $scope.showForm = false;
 
-      $scope.contacts = [{
-          name: 'Samuel',
-          tel: '81994556776',
-          operators: {
-            name: 'Claro',
-            code: '12'
-          },
-          date: new Date()
-        },
-        {
-          name: 'Bruna',
-          tel: '819966778294',
-          operators: {
-            name: 'Tim',
-            code: '14'
-          },
-          date: new Date()
-        },
-        {
-          name: 'Churros',
-          tel: '8199233020',
-          operators: {
-            name: 'Vivo',
-            code: '13'
-          },
-          date: new Date()
+      const loadContacts = function () {
+        $http({
+          method: 'GET',
+          url: API_URL
+        }).then(function (response){
+          if (response.status === 200) {
+            $scope.contacts = response.data
+          }
+        }, function (error){
+          console.error(error);
+        });
+      }
+
+      $scope.setShowForm = function () {
+        $scope.showForm = !$scope.showForm;
+      }
+
+      $scope.addContact = function (keyEvent, contact) {
+        if (keyEvent.which === 13) {
+          $http.post(API_URL, contact)
+          .then(function(response) {
+            delete $scope.contact;
+            $scope.showForm = false;
+            $scope.contacts.push(angular.copy(response.data));
+          })
+          .catch(error => {
+            console.error(error)
+          })
         }
-      ];
-
-      $scope.operators = [{
-          name: 'Claro',
-          code: 21
-        },
-        {
-          name: 'Oi',
-          code: 14
-        },
-        {
-          name: 'Tim',
-          code: 17
-        },
-        {
-          name: 'Vivo',
-          code: 13
-        }
-      ]
-
-      $scope.addContact = function (contact) {
-        contact.date = new Date();
-        $scope.contacts.push(angular.copy(contact));
-        delete $scope.contact;
-        $scope.contactForm.$setPrestine();
       }
 
       $scope.removeContact = function (contacts) {
-        $scope.contacts = contacts.filter(function (contact) {
-          if (!contact.selected) return contact;
+        const selectedContacts = contacts.filter(function (contact) {
+          if (contact.selected) return contact;
         });
+        selectedContacts.map(function(contact) {
+          $http.delete(`${API_URL}/${contact.id}`).then(function (response) {
+            if (response.status === 200) {
+              $scope.contacts = contacts.filter(function (contact) {
+                if (!contact.selected) return contact;
+              });
+            }
+          }, function (response) {
+            console.error('error', response);
+          });
+        })
       }
 
       $scope.isSelected = function (contacts) {
@@ -83,60 +75,56 @@
         $scope.direction = !$scope.direction
         $scope.order = type
       }
+
+      loadContacts()
     })
   </script>
 </head>
 
 <body ng-controller="listaTelefonicaCtrl">
   <div class="container">
-    <div class="jumbotron">
+    <header class="header clearfix">
       <div class="row">
-        <div class="col-xs-12 col-sm-6">
+        <div class="col-xs-12 col-sm-4">
           <h3 class="title">{{ title }}</h3>
         </div>
-        <div class="col-xs-12 col-sm-6">
-          <input type="text" ng-model="search" class="form-control" placeholder="buscar">
+        <div class="col-xs-12 col-sm-8">
+          <div class="form-inline pull-right">
+            <input type="text" ng-model="search" class="form-control" placeholder="buscar">
+            <button class="btn btn-primary" ng-click="setShowForm()">Adicionar Contato</button>
+            <button class="btn btn-danger" ng-show="isSelected(contacts)" ng-click="removeContact(contacts)">
+              <span class="glyphicon glyphicon-trash" aria-hidden="true"></span>
+            </button>
+          </div>
         </div>
       </div>
-      <table class="table table-striped">
-        <tr>
-          <th></th>
-          <th><a ng-click="orderBy('name')">Nome</a></th>
-          <th>Telefone</th>
-          <th>Operadora</th>
-          <th><a ng-click="orderBy('date')">Data de adição</a></th>
-        </tr>
-        <tr ng-repeat="contact in contacts | filter: {name: search} | orderBy: order || 'name':direction" ng-class="{active: contact.selected}">
-          <!-- <td ng-repeat="(key, value) in contact">{{ value }}</td> -->
-          <td><input type="checkbox" ng-model="contact.selected" /></td>
-          <td>{{ contact.name }}</td>
-          <td>{{ contact.tel }}</td>
-          <td>{{ contact.operators.name }}</td>
-          <td>{{ contact.date | date:'dd/MM/yyyy' }}</td>
-        </tr>
-      </table>
-      <hr />
-      <form name="contactForm">
-        <input type="text" class="form-control" name="name" ng-model="contact.name" ng-required="true"
-          placeholder="Nome do contato">
-        <input type="number" class="form-control" name="tel" ng-model="contact.tel" ng-required="true"
-          placeholder="Telefone do contato">
-        <select class="form-control" name="operators" ng-model="contact.operators"
-          ng-options="operator.name for operator in operators">
-          <option value="">Selecione uma operadora</option>
-        </select>
-        <button type="submit" class="btn btn-primary btn-block" ng-click="addContact(contact)"
-          ng-disabled="contactForm.$invalid">Adicionar Contato</button>
-        <button class="btn btn-danger btn-block" ng-show="isSelected(contacts)"
-          ng-click="removeContact(contacts)">Apagar contatos</button>
-      </form>
-      <div ng-show="contactForm.$invalid && contactForm.$prestine" class="alert alert-danger alert-dismissible"
-        role="alert">
-        <button type="button" class="close" data-dismiss="alert" aria-label="Close"><span
-            aria-hidden="true">&times;</span></button>
-        Por favor, preencha o Nome e o Telefone do contato!
-      </div>
-    </div>
+    </header>
+    <table class="table">
+      <tr>
+        <th></th>
+        <th><a ng-click="orderBy('name')">Nome</a></th>
+        <th><a ng-click="orderBy('email')">Email</a></th>
+        <th>Telefone</th>
+      </tr>
+      <tr ng-show="showForm">
+        <td>
+          <button type="button" class="btn btn-danger" data-dismiss="alert" aria-label="Close" ng-click="setShowForm()">
+            <span aria-hidden="true">&times;</span>
+          </button>
+        </td>
+        <td><input type="text" class="form-control" name="name" ng-model="contact.name" autofocus placeholder="Joselito da Silva"></td>
+        <td><input type="email" class="form-control" name="email" ng-model="contact.email" placeholder="joselito@gmail.com"></td>
+        <td><input type="text" class="form-control" name="phone" ng-model="contact.phone" ng-keypress="addContact($event, contact)" placeholder="81 98823-2333"></td>
+      </tr>
+      <tr ng-repeat="contact in contacts | filter: {name: search} | orderBy: order || 'name':direction" ng-class="{active: contact.selected}">
+        <!-- <td ng-repeat="(key, value) in contact">{{ value }}</td> -->
+        <td><input type="checkbox" ng-model="contact.selected" /></td>
+        <td>{{ contact.name }}</td>
+        <td>{{ contact.email }}</td>
+        <td>{{ contact.phone }}</td>
+      </tr>
+    </table>
+    <hr />
     <div ng-include="'components/footer.html'"></div>
   </div>
 
