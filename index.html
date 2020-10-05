@@ -14,6 +14,8 @@
   <script src="./js/controllers/listaTelefonicaCtrl.js"></script>
   <script src="./js/config/contactsAPIConfig.js"></script>
   <script src="./js/services/contactsAPIService.js"></script>
+  <script src="./js/filters/nameFilter.js"></script>
+  <script src="./js/filters/ellipsisFilter.js"></script>
 </head>
 
 <body ng-controller="listaTelefonicaCtrl">
@@ -54,8 +56,8 @@
       <tr ng-repeat="contact in contacts | filter: {name: search} | orderBy: order || 'name':direction" ng-class="{active: contact.selected}">
         <!-- <td ng-repeat="(key, value) in contact">{{ value }}</td> -->
         <td><input type="checkbox" ng-model="contact.selected" /></td>
-        <td>{{ contact.name }}</td>
-        <td>{{ contact.email }}</td>
+        <td>{{ contact.name | name | ellipsis: 20 }}</td>
+        <td>{{ contact.email | lowercase }}</td>
         <td>{{ contact.phone }}</td>
       </tr>
     </table>
