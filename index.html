@@ -16,26 +16,19 @@
   <script src="./js/services/contactsAPIService.js"></script>
   <script src="./js/filters/nameFilter.js"></script>
   <script src="./js/filters/ellipsisFilter.js"></script>
+  <script src="./js/directives/uiHeaderDIrective.js"></script>
 </head>
 
 <body ng-controller="listaTelefonicaCtrl">
   <div class="container">
-    <header class="header clearfix">
-      <div class="row">
-        <div class="col-xs-12 col-sm-4">
-          <h3 class="title">{{ title }}</h3>
-        </div>
-        <div class="col-xs-12 col-sm-8">
-          <div class="form-inline pull-right">
-            <input type="text" ng-model="search" class="form-control" placeholder="buscar">
-            <button class="btn btn-primary" ng-click="setShowForm()">Adicionar Contato</button>
-            <button class="btn btn-danger" ng-show="isSelected(contacts)" ng-click="removeContact(contacts)">
-              <span class="glyphicon glyphicon-trash" aria-hidden="true"></span>
-            </button>
-          </div>
-        </div>
-      </div>
-    </header>
+    <!-- <div ng-include="'view/header.html'" ></div> -->
+    <ui-header 
+      title="Agenda" 
+      search="search" 
+      is-show="setShowForm()" 
+      is-selected="isSelected(contacts)"
+      on-delete="removeContact(contacts)""
+    ></ui-header>
     <table class="table">
       <tr>
         <th></th>

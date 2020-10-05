@@ -1,0 +1,16 @@
+<header class="header clearfix">
+  <div class="row">
+    <div class="col-xs-12 col-sm-4">
+      <h3 class="title">{{ title }}</h3>
+    </div>
+    <div class="col-xs-12 col-sm-8">
+      <div class="form-inline pull-right">
+        <input type="text" ng-model="search" class="form-control" placeholder="buscar">
+        <button class="btn btn-primary" ng-click="show()">Adicionar Contato</button>
+        <button class="btn btn-danger" ng-show="selected()" ng-click="delete()">
+          <span class="glyphicon glyphicon-trash" aria-hidden="true"></span>
+        </button>
+      </div>
+    </div>
+  </div>
+</header>

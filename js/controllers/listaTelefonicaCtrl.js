@@ -1,5 +1,4 @@
 angular.module('listaTelefonica').controller('listaTelefonicaCtrl', function ($scope, contactsAPI) {
-  $scope.title = 'Lista Telefônica';
   $scope.showForm = false;
 
   const loadContacts = function () {
